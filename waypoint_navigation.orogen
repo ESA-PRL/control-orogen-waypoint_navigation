@@ -42,7 +42,7 @@ task_context "Task" do
     runtime_states :DRIVING, :ALIGNING, :TARGET_REACHED, :OUT_OF_BOUNDARIES, :NO_TRAJECTORY, :NO_POSE
 
     needs_configuration
-    port_driven
+    periodic 0.25
 end
 
 task_context "FollowingTest" do
