@@ -20,10 +20,8 @@
  * +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  */
 
-
 #ifndef WAYPOINT_NAVIGATION_TASK_TASK_HPP
 #define WAYPOINT_NAVIGATION_TASK_TASK_HPP
-
 
 #include "waypoint_navigation/TaskBase.hpp"
 #include <base/Waypoint.hpp>
