@@ -137,32 +137,27 @@ void Task::updateHook()
             }
             case waypoint_navigation_lib::TARGET_REACHED:{
                 state(TARGET_REACHED);
-                roverStopped = true;
                 this->stopRover();
                 //mc.translation = 0.00001; // This command puts all wheel straight when reaching the target. Usually would stay in Point Turn configuration.
                 break;
             }
             case waypoint_navigation_lib::OUT_OF_BOUNDARIES:{
                 state(OUT_OF_BOUNDARIES);
-                roverStopped = true;
                 this->stopRover();
                 break;
             }
             case waypoint_navigation_lib::NO_TRAJECTORY:{
                 state(NO_TRAJECTORY);
-                roverStopped = true;
                 this->stopRover();
                 break;
             }
             case waypoint_navigation_lib::NO_POSE:{
                 state(NO_POSE);
-                roverStopped = true;
                 this->stopRover();
                 break;
             }
             default:{
 				// safety first!
-				roverStopped = true;
                 this->stopRover();
                 break;
             }
@@ -193,6 +188,7 @@ void Task::cleanupHook()
 }
 
 void Task::stopRover(){
+    roverStopped = true;
 	base::commands::Motion2D mc;
     mc.translation = 0.0; mc.rotation = 0.0;
     if( mc.translation != mc_prev.translation ||
