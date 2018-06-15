@@ -67,6 +67,19 @@ bool Task::configureHook()
 
 void Task::updateHook()
 {
+    bool cancel_trajectory = false;
+    if(_cancel_trajectory.read(cancel_trajectory) == RTT::NewData)
+    {
+        if (cancel_trajectory)
+        {
+            this->stopRover();
+            trajectory.clear();
+            std::vector<base::Waypoint*> waypoints;
+            pathTracker->setTrajectory(waypoints);
+            return;
+        }
+    }
+
     // -------------------  TRAJECTORY SETTING   ---------------
     //if(_trajectory.readNewest(trajectory) == RTT::NewData ) { // Trajectory input contains new data
     if(_trajectory.read(trajectory) == RTT::NewData ) {
