@@ -107,19 +107,19 @@ void Task::updateHook()
     // -------------- SPEED ADJUSTMENT -------------------------
     if(_speed_input.connected())
     {
-	double new_speed;
-	if(_speed_input.read(new_speed) == RTT::NewData)
-	{
-		bool configSuccessful;
-		ptConfig.translationalVelocity = new_speed;
-		configSuccessful = pathTracker->configure(
-                	ptConfig.minTurnRadius,
-                	ptConfig.translationalVelocity,
-                	ptConfig.rotationalVelocity,
-                	ptConfig.corridor,
-                	ptConfig.lookaheadDistance,
-        		ptConfig.backwards);
-	}
+        double new_speed;
+        if(_speed_input.read(new_speed) == RTT::NewData)
+        {
+            bool configSuccessful;
+            ptConfig.translationalVelocity = new_speed;
+            configSuccessful = pathTracker->configure(
+                    ptConfig.minTurnRadius,
+                    ptConfig.translationalVelocity,
+                    ptConfig.rotationalVelocity,
+                    ptConfig.corridor,
+                    ptConfig.lookaheadDistance,
+                    ptConfig.backwards);
+        }
     }
 
     //-------------- State Update from the library to the component
@@ -202,56 +202,3 @@ void Task::stopRover(){
         mc_prev = mc;
     }
 }
-/*
-void Task::preprocessPath(std::vector<base::Waypoint*>& waypoints){
-	// Add all waypoints to the path
-	if ( !downsampleGridBasedPath){
-		// Iterate through trajectory received: [1st to Nth] and add each point
-	    for (std::vector<base::Waypoint>::const_iterator it = trajectory.begin();
-	            it != trajectory.end(); ++it)
-	        {
-	        	waypoints.push_back(new base::Waypoint(*it));
-	        }
-	} else {
-		// Downsampling requested/
-		int dxPrev, dyPrev, dxNext, dyNext;
-		int unitScale = 100; // to cm
-		base::Vector3d currWp, nextWp;
-		base::Waypoint* pWaypointToAdd;
-
-		// Initialize //
-		currWp = trajectory.at(0).position;
-		nextWp = trajectory.at(1).position;
-		dxPrev = round(unitScale*(nextWp.x() - currWp.x()));
-		dyPrev = round(unitScale*(nextWp.y() - currWp.y()));
-		pWaypointToAdd = &trajectory.at(0);
-		waypoints.push_back(pWaypointToAdd);
-
-		// Iterate //
-		for (size_t it = 1; it < trajectory.size() - 1 ; it++)
-	    {
-        	// Shift the waypoints being examined //
-        	currWp = nextWp;
-        	nextWp = trajectory.at(it+1).position;
-
-        	// Get the [dx, dy] vector to the next //
-        	dxNext = round(unitScale*(nextWp.x() - currWp.x()));
-			dyNext = round(unitScale*(nextWp.y() - currWp.y()));
-
-			// Is the waypoint significant or lies on a line defined by the prev and next?
-			if (dxPrev != dxNext || dyPrev != dyNext){
-				// Significant, will be added
-				pWaypointToAdd = &trajectory.at(it);
-				waypoints.push_back(pWaypointToAdd);
-				// Otherwise does not have to be on the path.
-			}
-			// Shift the calculated [dx, dy] to be used in next iteration //
-			dxPrev = dxNext;
-			dyPrev = dyNext;
-	    }
-	    // Terminate //
-	    pWaypointToAdd = &trajectory.back();
-		waypoints.push_back(pWaypointToAdd);
-	}
-}
-*/
