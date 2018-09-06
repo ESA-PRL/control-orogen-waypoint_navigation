@@ -2,6 +2,7 @@ name "waypoint_navigation"
 version "0.1"
 
 using_library "waypoint_navigation"
+import_types_from "WaypointNavigation.hpp" # for NavigationState enum
 
 import_types_from "waypoint_navigationTypes.hpp"
 import_types_from "base"
@@ -36,7 +37,10 @@ task_context "Task" do
         doc "the waypoint towards which we are currently going"
 
     output_port("trajectory_status", "int").
-        doc "reports the state of the trajectory in execution"
+        doc "reports the state of the trajectory in execution as an integer"
+
+    output_port("trajectory_status_enum", "waypoint_navigation_lib/NavigationState").
+        doc "reports the state of the trajectory in execution as the enum"
 
     output_port("current_segment", "int").
         doc "indicates which segment is following the robot"

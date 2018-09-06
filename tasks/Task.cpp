@@ -168,7 +168,8 @@ void Task::updateHook()
             this->stopRover();
             break;
     }
-    _trajectory_status.write((int)currentState);
+    _trajectory_status.write(static_cast<int>(currentState));
+    _trajectory_status_enum.write(currentState);
     _current_segment.write(pathTracker->getCurrentSegment());
     // Write motion command to the ouput if different from previous
     if(( _repeatCommand.value() || mc.translation != mc_prev.translation || mc.rotation != mc_prev.rotation) && !roverStopped ){
