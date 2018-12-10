@@ -168,7 +168,7 @@ void Task::updateHook()
             this->stopRover();
             break;
     }
-    _trajectory_status.write((int)currentState);
+    _trajectory_status.write(static_cast<int>(currentState));
     _navigation_state.write(currentState);
     _current_segment.write(pathTracker->getCurrentSegment());
     // Write motion command to the ouput if different from previous
