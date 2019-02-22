@@ -75,7 +75,8 @@ void Task::updateHook()
         {
             this->stopRover();
             trajectory.clear();
-            std::vector<base::Waypoint*> waypoints;
+            _trajectory.clear();
+            std::vector<base::Waypoint*> waypoints = {};
             pathTracker->setTrajectory(waypoints);
             return;
         }
@@ -110,7 +111,7 @@ void Task::updateHook()
     // Create zero motion command
     base::commands::Motion2D mc;
     mc.translation = 0.0; mc.rotation = 0.0;
-    if(!trajectory.empty() && positionValid)
+    if(!(trajectory.empty()) && positionValid)
     {
         // If position data are valid, calculate the motion command
         pathTracker->update(mc);
