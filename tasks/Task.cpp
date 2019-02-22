@@ -27,7 +27,8 @@
 using namespace waypoint_navigation;
 
 Task::Task(std::string const& name)
-    : TaskBase(name)
+    : TaskBase(name),
+    previous_navigation_state(waypoint_navigation_lib::NO_POSE)
 {
     pathTracker = NULL;
 }
@@ -168,15 +169,18 @@ void Task::updateHook()
             this->stopRover();
             break;
     }
-    _trajectory_status.write(static_cast<int>(currentState));
-    _navigation_state.write(currentState);
+    if (previous_navigation_state != currentState)
+    {
+        previous_navigation_state = currentState;
+        _trajectory_status.write(static_cast<int>(currentState));
+        _navigation_state.write(currentState);
+    }
     _current_segment.write(pathTracker->getCurrentSegment());
     // Write motion command to the ouput if different from previous
     if(( _repeatCommand.value() || mc.translation != mc_prev.translation || mc.rotation != mc_prev.rotation) && !roverStopped ){
         _motion_command.write(mc);
         mc_prev = mc;
     }
-
 }
 
 void Task::errorHook(){

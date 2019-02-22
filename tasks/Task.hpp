@@ -39,9 +39,10 @@ namespace waypoint_navigation {
     protected:
 	///Instance of the dumbTrajectoryFollower driver
 	waypoint_navigation_lib::WaypointNavigation *pathTracker;
+	waypoint_navigation_lib::NavigationState previous_navigation_state;
 	///Trajectory in the format of the driver
 	std::vector<base::Waypoint> trajectory;
-    	base::commands::Motion2D mc_prev;
+    base::commands::Motion2D mc_prev;
 	pathTrackerConfig ptConfig;
     bool positionValid;
     bool roverStopped;
