@@ -26,6 +26,8 @@
 #include "waypoint_navigation/TaskBase.hpp"
 #include <base/Waypoint.hpp>
 
+#include "base-logging/Logging.hpp"
+
 namespace waypoint_navigation_lib{
 	class WaypointNavigation;
 }
