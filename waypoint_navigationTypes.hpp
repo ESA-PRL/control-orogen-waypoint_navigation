@@ -1,44 +1,37 @@
-#ifndef WAYPOINT_NAVIGATION_TYPE_HPP
-#define WAYPOINT_NAVIGATION_TYPE_HPP
+#pragma once
 
-namespace waypoint_navigation {
+namespace waypoint_navigation
+{
 
-    /** Configuration **/
-	struct pathTrackerConfig
-	{	
-		// Paramater							Unit
-		//-----------------------------------------------------------------------
-		// Minimum radius of robot's Ackermann turn			 (m)
-		double minTurnRadius;
+struct pathTrackerConfig
+{
+    // Minimum radius of robot's Ackermann turn			 (m)
+    double minTurnRadius;
 
-		// Robot's translational velocity during Ackermann turns	 (m/s)
-		double translationalVelocity;
-		
-		// Robot's rotational velocity during point turns		 (rad/s)
-		double rotationalVelocity;
+    // Robot's translational velocity during Ackermann turns	 (m/s)
+    double translationalVelocity;
 
-		// Safety corridor (1/2 width) arround the nominal trajectory	 (m)
-		double corridor;		
+    // Robot's rotational velocity during point turns		 (rad/s)
+    double rotationalVelocity;
 
-		// Maximum allowed disalignment from target heading in the final pose (rad)
-		double maxDisalignment;	
-		
-		// Distance to the lookahead point of the Pure Pursuit Algorithm (m)
-		double lookaheadDistance;	
+    // Safety corridor (1/2 width) arround the nominal trajectory	 (m)
+    double corridor;
 
-		// Is backward motion permitted? true/false
-		bool backwards;	
-    };
-    struct controllerPDConfig
-	{	
-		// Paramater							
-		//-----------------------------------------------------------------------
-		double P;
-		double D;
-		double saturation; // Input disalignment error saturation
-    };
-    
-	
-	
-}
-#endif
+    // Maximum allowed disalignment from target heading in the final pose (rad)
+    double maxDisalignment;
+
+    // Distance to the lookahead point of the Pure Pursuit Algorithm (m)
+    double lookaheadDistance;
+
+    // Is backward motion permitted? true/false
+    bool backwards;
+};
+
+struct controllerPDConfig
+{
+    double P;
+    double D;
+    double saturation;  // Input disalignment error saturation
+};
+
+}  // namespace waypoint_navigation

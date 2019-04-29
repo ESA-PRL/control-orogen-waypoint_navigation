@@ -7,7 +7,7 @@
  *
  * +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  *
- * Description: Class for simple simulation (only integration of 
+ * Description: Class for simple simulation (only integration of
  * velocity commands) of robot motions.
  *
  * +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -19,53 +19,36 @@
  *
  * +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  */
+#pragma once
 
-#ifndef WAYPOINT_NAVIGATION_FOLLOWINGTEST_TASK_HPP
-#define WAYPOINT_NAVIGATION_FOLLOWINGTEST_TASK_HPP
-
-#include "waypoint_navigation/FollowingTestBase.hpp"
 #include <Eigen/Geometry>
-#include <iostream>
 #include <base/Timeout.hpp>
+#include <iostream>
+#include "waypoint_navigation/FollowingTestBase.hpp"
 
-namespace waypoint_navigation {
+namespace waypoint_navigation
+{
 
-    
-    class FollowingTest : public FollowingTestBase
-    {
-	friend class FollowingTestBase;
-    protected:
-        base::samples::RigidBodyState mStartPose;
-        base::samples::RigidBodyState mCurrentPose;
-        bool mStartPoseReceived;
-        base::Time mTimeStart;
-        base::commands::Motion2D mc;
+class FollowingTest : public FollowingTestBase
+{
+    friend class FollowingTestBase;
 
+  protected:
+    base::samples::RigidBodyState mStartPose;
+    base::samples::RigidBodyState mCurrentPose;
+    bool mStartPoseReceived;
+    base::Time mTimeStart;
+    base::commands::Motion2D mc;
 
-    public:
-        FollowingTest(std::string const& name = "waypoint_navigation::FollowingTest");
-        FollowingTest(std::string const& name, RTT::ExecutionEngine* engine);
-
-	   ~FollowingTest();
-
-        
-        bool configureHook();
-
-        
-        bool startHook();
-
-        
-        void updateHook();
-
-        
-        void errorHook();
-
-        
-        void stopHook();
-
-        void cleanupHook();
-    };
-}
-
-#endif
-
+  public:
+    FollowingTest(std::string const& name = "waypoint_navigation::FollowingTest");
+    FollowingTest(std::string const& name, RTT::ExecutionEngine* engine);
+    ~FollowingTest();
+    bool configureHook();
+    bool startHook();
+    void updateHook();
+    void errorHook();
+    void stopHook();
+    void cleanupHook();
+};
+}  // namespace waypoint_navigation

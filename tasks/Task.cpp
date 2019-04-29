@@ -20,48 +20,42 @@
  * +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  */
 
-
 #include "Task.hpp"
 #include <WaypointNavigation.hpp>
 
 using namespace waypoint_navigation;
 
 Task::Task(std::string const& name)
-    : TaskBase(name),
-    previous_navigation_state(waypoint_navigation_lib::NO_POSE)
+    : TaskBase(name), previous_navigation_state(waypoint_navigation_lib::NO_POSE)
 {
     pathTracker = NULL;
 }
 
-/// The following lines are template definitions for the various state machine
-// hooks defined by Orocos::RTT. See Task.hpp for more detailed
-// documentation about them.
-
 bool Task::configureHook()
 {
-    if (! TaskBase::configureHook())
-        return false;
+    if (!TaskBase::configureHook()) return false;
     bool configSuccessful;
 
     ptConfig = _ptConfig.value();
     pathTracker = new waypoint_navigation_lib::WaypointNavigation();
-    configSuccessful = pathTracker->configure(
-            ptConfig.minTurnRadius,
-            ptConfig.translationalVelocity,
-            ptConfig.rotationalVelocity,
-            ptConfig.corridor,
-            ptConfig.lookaheadDistance,
-            ptConfig.backwards);
+    configSuccessful = pathTracker->configure(ptConfig.minTurnRadius,
+                                              ptConfig.translationalVelocity,
+                                              ptConfig.rotationalVelocity,
+                                              ptConfig.corridor,
+                                              ptConfig.lookaheadDistance,
+                                              ptConfig.backwards);
 
     controllerPDConfig pd = _pdConfig.value();
     configSuccessful &= pathTracker->configurePD(pd.P, pd.D, pd.saturation);
-    configSuccessful &= pathTracker->configureTol(_tolPos.value(), _tolHeading.value()*M_PI/180.0);
+    configSuccessful &=
+        pathTracker->configureTol(_tolPos.value(), _tolHeading.value() * M_PI / 180.0);
 
     positionValid = false;
     roverStopped = false;
     trajectory.clear();
 
-    mc_prev.translation = 0; mc_prev.rotation = 0;
+    mc_prev.translation = 0;
+    mc_prev.rotation = 0;
 
     return true;
 }
@@ -69,7 +63,7 @@ bool Task::configureHook()
 void Task::updateHook()
 {
     bool cancel_trajectory = false;
-    if(_cancel_trajectory.read(cancel_trajectory) == RTT::NewData)
+    if (_cancel_trajectory.read(cancel_trajectory) == RTT::NewData)
     {
         if (cancel_trajectory)
         {
@@ -83,26 +77,31 @@ void Task::updateHook()
     }
 
     // -------------------  TRAJECTORY SETTING   ---------------
-    //if(_trajectory.readNewest(trajectory) == RTT::NewData ) { // Trajectory input contains new data
-    if(_trajectory.read(trajectory) == RTT::NewData ) {
-        //convert to driver format
-        //std::cout << "WaypointNavigation::updateHook(), Task has  " << trajectory.size() << " points in trajectory." << std::endl;
+    // if(_trajectory.readNewest(trajectory) == RTT::NewData ) { // Trajectory input contains new
+    // data
+    if (_trajectory.read(trajectory) == RTT::NewData)
+    {
+        // convert to driver format
+        // std::cout << "WaypointNavigation::updateHook(), Task has  " << trajectory.size() << "
+        // points in trajectory." << std::endl;
 
         // Pass the waypoints to the library using pointers
         std::vector<base::Waypoint*> waypoints;
         for (std::vector<base::Waypoint>::const_iterator it = trajectory.begin();
-                it != trajectory.end(); ++it) // Iterate through trajectory received: [1st to Nth].
+             it != trajectory.end();
+             ++it)  // Iterate through trajectory received: [1st to Nth].
         {
-            waypoints.push_back(new base::Waypoint(*it)); // Add element to the end of the vector
+            waypoints.push_back(new base::Waypoint(*it));  // Add element to the end of the vector
         }
         pathTracker->setTrajectory(waypoints);
-        //std::cout << "WaypointNavigation::updateHook(), Trajectory set to path tracker." << std::endl;
+        // std::cout << "WaypointNavigation::updateHook(), Trajectory set to path tracker." <<
+        // std::endl;
     }
 
     // -------------------   NEW POSE READING   ----------------
     base::samples::RigidBodyState pose;
-//    if(_pose.readNewest(pose) != RTT::NoData )
-    if(_pose.read(pose) != RTT::NoData )
+    //    if(_pose.readNewest(pose) != RTT::NoData )
+    if (_pose.read(pose) != RTT::NoData)
     {
         positionValid = pathTracker->setPose(pose);
     }
@@ -110,8 +109,9 @@ void Task::updateHook()
     // -------------------   MOTION UPDATE      ----------------
     // Create zero motion command
     base::commands::Motion2D mc;
-    mc.translation = 0.0; mc.rotation = 0.0;
-    if(!(trajectory.empty()) && positionValid)
+    mc.translation = 0.0;
+    mc.rotation = 0.0;
+    if (!(trajectory.empty()) && positionValid)
     {
         // If position data are valid, calculate the motion command
         pathTracker->update(mc);
@@ -120,26 +120,26 @@ void Task::updateHook()
     }
 
     // -------------- SPEED ADJUSTMENT -------------------------
-    if(_speed_input.connected())
+    if (_speed_input.connected())
     {
         double new_speed;
-        if(_speed_input.read(new_speed) == RTT::NewData)
+        if (_speed_input.read(new_speed) == RTT::NewData)
         {
             bool configSuccessful;
             ptConfig.translationalVelocity = new_speed;
-            configSuccessful = pathTracker->configure(
-                    ptConfig.minTurnRadius,
-                    ptConfig.translationalVelocity,
-                    ptConfig.rotationalVelocity,
-                    ptConfig.corridor,
-                    ptConfig.lookaheadDistance,
-                    ptConfig.backwards);
+            configSuccessful = pathTracker->configure(ptConfig.minTurnRadius,
+                                                      ptConfig.translationalVelocity,
+                                                      ptConfig.rotationalVelocity,
+                                                      ptConfig.corridor,
+                                                      ptConfig.lookaheadDistance,
+                                                      ptConfig.backwards);
         }
     }
 
     //-------------- State Update from the library to the component
     waypoint_navigation_lib::NavigationState currentState = pathTracker->getNavigationState();
-    switch(currentState) {
+    switch (currentState)
+    {
         case waypoint_navigation_lib::DRIVING:
             roverStopped = false;
             state(DRIVING);
@@ -151,7 +151,8 @@ void Task::updateHook()
         case waypoint_navigation_lib::TARGET_REACHED:
             state(TARGET_REACHED);
             this->stopRover();
-            //mc.translation = 0.00001; // This command puts all wheel straight when reaching the target. Usually would stay in Point Turn configuration.
+            // mc.translation = 0.00001; // This command puts all wheel straight when reaching the
+            // target. Usually would stay in Point Turn configuration.
             break;
         case waypoint_navigation_lib::OUT_OF_BOUNDARIES:
             state(OUT_OF_BOUNDARIES);
@@ -178,19 +179,17 @@ void Task::updateHook()
     }
     _current_segment.write(pathTracker->getCurrentSegment());
     // Write motion command to the ouput if different from previous
-    if(( _repeatCommand.value() || mc.translation != mc_prev.translation || mc.rotation != mc_prev.rotation) && !roverStopped ){
+    if ((_repeatCommand.value() || mc.translation != mc_prev.translation
+         || mc.rotation != mc_prev.rotation)
+        && !roverStopped)
+    {
         _motion_command.write(mc);
         mc_prev = mc;
     }
 }
 
-void Task::errorHook(){
-    stopRover();
-}
-
-void Task::stopHook(){
-    stopRover();
-}
+void Task::errorHook() { stopRover(); }
+void Task::stopHook() { stopRover(); }
 
 void Task::cleanupHook()
 {
@@ -198,12 +197,13 @@ void Task::cleanupHook()
     delete pathTracker;
 }
 
-void Task::stopRover(){
+void Task::stopRover()
+{
     roverStopped = true;
     base::commands::Motion2D mc;
-    mc.translation = 0.0; mc.rotation = 0.0;
-    if( mc.translation != mc_prev.translation ||
-        mc.rotation    != mc_prev.rotation )
+    mc.translation = 0.0;
+    mc.rotation = 0.0;
+    if (mc.translation != mc_prev.translation || mc.rotation != mc_prev.rotation)
     {
         _motion_command.write(mc);
         mc_prev = mc;

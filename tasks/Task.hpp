@@ -7,7 +7,7 @@
  *
  * +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  *
- * Description: Class encapsulating the pure-pursuit based path 
+ * Description: Class encapsulating the pure-pursuit based path
  * follower, which was implemented for the six-wheeled ExoTeR rover.
  *
  * +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -19,46 +19,43 @@
  *
  * +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  */
+#pragma once
 
-#ifndef WAYPOINT_NAVIGATION_TASK_TASK_HPP
-#define WAYPOINT_NAVIGATION_TASK_TASK_HPP
-
-#include "waypoint_navigation/TaskBase.hpp"
 #include <base/Waypoint.hpp>
-
 #include "base-logging/Logging.hpp"
+#include "waypoint_navigation/TaskBase.hpp"
 
-namespace waypoint_navigation_lib{
-	class WaypointNavigation;
+namespace waypoint_navigation_lib
+{
+class WaypointNavigation;
 }
 
-namespace waypoint_navigation {
-    class Task : public TaskBase
-    {
-	friend class TaskBase;
-    protected:
-	///Instance of the dumbTrajectoryFollower driver
-	waypoint_navigation_lib::WaypointNavigation *pathTracker;
-	waypoint_navigation_lib::NavigationState previous_navigation_state;
-	///Trajectory in the format of the driver
-	std::vector<base::Waypoint> trajectory;
+namespace waypoint_navigation
+{
+class Task : public TaskBase
+{
+    friend class TaskBase;
+
+  protected:
+    // Instance of the dumbTrajectoryFollower driver
+    waypoint_navigation_lib::WaypointNavigation* pathTracker;
+    waypoint_navigation_lib::NavigationState previous_navigation_state;
+    // Trajectory in the format of the driver
+    std::vector<base::Waypoint> trajectory;
     base::commands::Motion2D mc_prev;
-	pathTrackerConfig ptConfig;
+    pathTrackerConfig ptConfig;
     bool positionValid;
     bool roverStopped;
-	
-    public:
-        Task(std::string const& name = "WaypointNavigation::Task");
-        bool configureHook();
-        void updateHook();
-        void errorHook();
-        void stopHook();
-        void cleanupHook();
 
-    private:
-        void stopRover();
-    //	void preprocessPath		(std::vector<base::Waypoint*>& 	waypoints);
-    };
-}
+  public:
+    Task(std::string const& name = "WaypointNavigation::Task");
+    bool configureHook();
+    void updateHook();
+    void errorHook();
+    void stopHook();
+    void cleanupHook();
 
-#endif
+  private:
+    void stopRover();
+};
+}  // namespace waypoint_navigation
